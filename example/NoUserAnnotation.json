@@ -1,0 +1,10 @@
+{
+  "start_up" :
+  ["python3 ~/chaos_demo/chaostoolkit-documentation-code/tutorials/a-simple-walkthrough/astre.py",
+    "python3 ~/chaos_demo/chaostoolkit-documentation-code/tutorials/a-simple-walkthrough/sunset.py"],
+
+  "sample_input" : ["curl -k https://localhost:8443/city/Chicago"],
+
+  "fuzz_internal_files_path_to_sources" : ["/Users/anjmenon/chaos_demo/chaostoolkit-documentation-code/tutorials/a-simple-walkthrough/astre.py",
+    "/Users/anjmenon/chaos_demo/chaostoolkit-documentation-code/tutorials/a-simple-walkthrough/sunset.py"]
+}

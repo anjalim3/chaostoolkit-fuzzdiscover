@@ -1,0 +1,9 @@
+{
+  "start_up" :
+  ["python3 ~/chaos_demo/chaostoolkit-documentation-code/tutorials/a-simple-walkthrough/sunset.py",
+    "python3 ~/chaos_demo/chaostoolkit-documentation-code/tutorials/a-simple-walkthrough/sunset.py"],
+
+  "sample_input" : ["curl -k https://localhost:@@{ct_Fuzz_Number{8443}}/@@{ct_Fuzz_String{city}}/@@{ct_Fuzz_String{Chicago}}"],
+
+  "is_annotated" : "true"
+}
