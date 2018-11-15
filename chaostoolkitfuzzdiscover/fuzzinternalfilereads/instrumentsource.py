@@ -9,6 +9,7 @@ def __unsupported_file_type(sourcefile):
 def __mock_file_reads_in_python(source_file):
     with open(str(source_file)) as original:
         for line in original:
+            original.write(line.replace("fopen"))
             print line
             #TODO: Replace fopen(something, r) with fopen("fuzzed_file", r). But it's 3:30 am and I want to sleep now
 
