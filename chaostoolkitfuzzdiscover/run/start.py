@@ -18,8 +18,8 @@ def __generate_fuzz_data(index, kitty_modal):
     fuzzer.start()
     fuzzer.stop()
 
-#start_up, fuzz_internal_files, kitty_modals = InputParser.parse_userinput("../../example/NoUserAnnotation.json")
-start_up, fuzz_internal_files, kitty_modals = InputParser.parse_userinput("../../example/UserAnnotated.json")
+start_up, fuzz_internal_files, kitty_modals = InputParser.parse_userinput("../../example/NoUserAnnotation.json")
+#start_up, fuzz_internal_files, kitty_modals = InputParser.parse_userinput("../../example/UserAnnotated.json")
 exit(0) #ToDo: Only for testing. Remove.
 for index, modal in enumerate(kitty_modals):
     __generate_fuzz_data(index, modal)

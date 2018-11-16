@@ -1,40 +1,53 @@
 from sourcebackup import SourceBackup
+import re
 
 #ToDo: fix issue with paths from home
 #ToDo: fix need to create directories
+#ToDo: Improve regex for python: currently does not account for default = 'r"
+__python_regex_part_1 = "((open\(.*?,'r'\))|"
+__python_regex_part_2 = '(open\(.*?,\\"r\\"\)))'
+__generic_delimiters_begin = [" ", "\t", "\n"]
+__generic_delimiters_end = [" ", "\t", "\n"]
+__python_delimiters_end = [":", "\\"]
+__fuzzed_file_name = "../../fuzzed_file.txt"
+__back_up_dir = "../../backup/"
 
-def __unsupported_file_type(sourcefile):
+def __unsupported_file_type(backup_file, sourcefile):
     raise Exception("Unsupported file type for source file: "+sourcefile)
 
-def __mock_file_reads_in_python(source_file):
-    with open(str(source_file)) as original:
-        for line in original:
-            original.write(line.replace("fopen"))
-            print line
-            #TODO: Replace fopen(something, r) with fopen("fuzzed_file", r). But it's 3:30 am and I want to sleep now
+#ToDo: this method is incomplete. broken regex.
+def __mock_file_reads_in_python(backup_file, source_file):
+    with open(__back_up_dir+str(backup_file), 'r') as __original_read:
+        with open(str(source_file), 'r') as __original_write:
+            for line in __original_read:
+                __all_delimiters_end = __generic_delimiters_end + __python_delimiters_end
+                __all_delimiters_begin = __generic_delimiters_begin
+                for end_delimiter in __all_delimiters_end:
+                    for begin_delimiter in __all_delimiters_begin:
+                        print repr("(" + begin_delimiter + ")" + __python_regex_part_1 + __python_regex_part_2 + "(" + end_delimiter + ")")
+                        re.sub("("+begin_delimiter+")"+ __python_regex_part_1 + __python_regex_part_2 +"("+end_delimiter+")", begin_delimiter + "open(\"" + __fuzzed_file_name + "\",'r')", line)
+                        #print "here"
+                #__original_write.write(line)
+                print line
 
-
-def __mock_file_reads_in_source(application_source_file_urls):
-    for source_file in application_source_file_urls:
-        __index_of_file_extension = str(source_file).rfind(".")
-        __file_extension = str(source_file)[__index_of_file_extension+1:]
+def __mock_file_reads_in_source(backup_files):
+    for backup in backup_files.get_backup_files():
+        __index_of_file_extension = str(backup['original']).rfind(".")
+        __file_extension = str(backup['original'])[__index_of_file_extension+1:]
+        func =__mock_file.get(__file_extension, lambda __lambda_backup, __lambda_source: __unsupported_file_type(__lambda_backup, __lambda_source))
+        func(str(backup['backup']), str(backup['original']))
 
 def instrument_source(application_source_file_urls):
     backup_files = SourceBackup()
-    for source_file in application_source_file_urls:
-        if "/" in source_file:
-            __last_index = str(source_file).rfind("/")
-            truncated_source_file_name = str(source_file)[__last_index+1:]
-        else:
-            truncated_source_file_name = source_file
-        new_source_file = "ct_fuzz_"+truncated_source_file_name
+    for index, source_file in enumerate(application_source_file_urls):
+        new_source_file = "ct_fuzz_backup_"+str(index)+".backup"
         backup_files.add_file_to_backups(new_source_file, source_file)
         with open(str(source_file)) as original:
             with open("../../backup/"+new_source_file, "w") as backup:
                 for line in original:
                     backup.write(line)
-        __mock_file_reads_in_source(application_source_file_urls)
-        return backup_files
+    __mock_file_reads_in_source(backup_files)
+    return backup_files
 
 def restore_source_from_backup(backup_files):
     if not isinstance(backup_files, SourceBackup):

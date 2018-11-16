@@ -1,13 +1,36 @@
 # chaostoolkit-fuzzdiscover
 Fuzz test experiment suggester for ChaosToolkit
 
+Gives "suggestions" for chaostoolkit experiments to run.
+
+The experiments only aims to check for system health, i.e, the experiments do not care if a particular call fails due to bad input.
+The experiments are concerned with finding and surfacing cases when bad inputs will irrecoverably detriment system's health,
+such as causing the service itself to fatally crash and never recover, dump files and never cleanup, cause persisting stress on CPU and Memory Utilization etc.
+
 ##Input Structure
-start_up : script(s) to run to set up the environment. Will not be fuzzed.
-Can be omitted
+###start_up :
+ script(s) to run to set up the environment. Will not be fuzzed.
+Can be omitted.
 
-sample_input : input(s) for the application. Will be fuzzed.
+###sample_input : 
+Input(s) for the application. Will be fuzzed.
+sample_input can be annotated or unannotated.
+####Annotated:
+If annotated, then only the blocks or parts of input specified by user will be fuzzed.
+Currently supported annotatations are Number and String
+#####ToDo: Add more annotation support. Required annotations: File, Enum
 
-fuzz_internal_files : should all files read by the application be fuzzed
+####UnAnnotated:
+If not annotated, then our tool tries to figure out structure of input on its own.
+#####ToDo: Improve the intelligence of "figuring out"
+
+###fuzz_internal_files : 
+Tells tool if it should fuzz all files read by the application.
+Works by instrumenting the source code, i.e. replaces calls for any file read with file read for fuzzed file - literally does `sed`
+The source code will be "uninstrumented" to original version after test.
+Currently supports only python
+####Disclaimer: Might not replace all file reads
+####ToDo: Add support for other languages. For the duration for which "modified" code is in use, all service calls will fail. Need a fix to minimize application down time.
 
 ## Sample Input
 
@@ -26,5 +49,5 @@ fuzz_internal_files : should all files read by the application be fuzzed
     }
 
 #ToDo
-multiple input
-annotated input
+Add probes
+Add support for multiple input

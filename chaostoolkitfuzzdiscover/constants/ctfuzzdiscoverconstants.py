@@ -1,5 +1,3 @@
 from enum import Enum
 
-class SupportedUserAnnotations(Enum):
-    Number = "Number",
-    String = "String"
+SupportedUserAnnotations = Enum("Number", "String")
