@@ -5,11 +5,11 @@ import re
 #ToDo: fix need to create directories
 #ToDo: Improve regex for python: currently does not account for default = 'r"
 __python_regex_part_1 = "((open\(.*?,'r'\))|"
-__python_regex_part_2 = '(open\(.*?,\\"r\\"\)))'
-__generic_delimiters_begin = [" ", "\t", "\n"]
-__generic_delimiters_end = [" ", "\t", "\n"]
-__python_delimiters_end = [":", "\\"]
-__fuzzed_file_name = "../../fuzzed_file.txt"
+__python_regex_part_2 = '(open\(.*?,\\\"r\\\"\)))'
+__generic_delimiters_begin = ""#" |\t|\n" #[" ", "\t", "\n"]
+__generic_delimiters_end = ""#" |\t|\n"#[" ", "\t", "\n"]
+__python_delimiters_end = ""#":|\\\\"#[":", "\\\\"]
+__fuzzed_file_name = "'../../fuzzed_file.txt'"
 __back_up_dir = "../../backup/"
 
 def __unsupported_file_type(backup_file, sourcefile):
@@ -17,18 +17,13 @@ def __unsupported_file_type(backup_file, sourcefile):
 
 #ToDo: this method is incomplete. broken regex.
 def __mock_file_reads_in_python(backup_file, source_file):
+    __regex = __python_regex_part_1 + __python_regex_part_2  # + "(" + __generic_delimiters_end + "|" + __python_delimiters_end + ")"
+    print __regex
     with open(__back_up_dir+str(backup_file), 'r') as __original_read:
-        with open(str(source_file), 'r') as __original_write:
+        with open(str(source_file), 'w') as __original_write:
             for line in __original_read:
-                __all_delimiters_end = __generic_delimiters_end + __python_delimiters_end
-                __all_delimiters_begin = __generic_delimiters_begin
-                for end_delimiter in __all_delimiters_end:
-                    for begin_delimiter in __all_delimiters_begin:
-                        print repr("(" + begin_delimiter + ")" + __python_regex_part_1 + __python_regex_part_2 + "(" + end_delimiter + ")")
-                        re.sub("("+begin_delimiter+")"+ __python_regex_part_1 + __python_regex_part_2 +"("+end_delimiter+")", begin_delimiter + "open(\"" + __fuzzed_file_name + "\",'r')", line)
-                        #print "here"
-                #__original_write.write(line)
-                print line
+                line = re.sub(__regex,  "open(" + __fuzzed_file_name + ",'r')", line)
+                __original_write.write(line)
 
 def __mock_file_reads_in_source(backup_files):
     for backup in backup_files.get_backup_files():
