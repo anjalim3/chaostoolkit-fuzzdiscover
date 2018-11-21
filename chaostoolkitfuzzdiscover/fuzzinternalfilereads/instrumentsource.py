@@ -3,9 +3,8 @@ import re
 
 #ToDo: fix issue with paths from home
 #ToDo: fix need to create directories
-#ToDo: Improve regex for python: currently does not account for default = 'r"
-__python_regex_part_1 = "((open\(.*?,'r'\))|"
-__python_regex_part_2 = '(open\(.*?,\\\"r\\\"\)))'
+__python_regex_part_1 = "((open\(.+?,'r'\))|(open\(.+?\))|"
+__python_regex_part_2 = '(open\(.+?,\\\"r\\\"\)))'
 __generic_delimiters_begin = ""#" |\t|\n" #[" ", "\t", "\n"]
 __generic_delimiters_end = ""#" |\t|\n"#[" ", "\t", "\n"]
 __python_delimiters_end = ""#":|\\\\"#[":", "\\\\"]
@@ -18,7 +17,6 @@ def __unsupported_file_type(backup_file, sourcefile):
 #ToDo: this method is incomplete. broken regex.
 def __mock_file_reads_in_python(backup_file, source_file):
     __regex = __python_regex_part_1 + __python_regex_part_2  # + "(" + __generic_delimiters_end + "|" + __python_delimiters_end + ")"
-    print __regex
     with open(__back_up_dir+str(backup_file), 'r') as __original_read:
         with open(str(source_file), 'w') as __original_write:
             for line in __original_read:
