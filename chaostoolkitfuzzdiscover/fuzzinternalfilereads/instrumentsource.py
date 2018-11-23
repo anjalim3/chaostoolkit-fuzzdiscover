@@ -8,7 +8,7 @@ __python_regex_part_2 = '(open\(.+?,\\\"r\\\"\)))'
 __generic_delimiters_begin = ""#" |\t|\n" #[" ", "\t", "\n"]
 __generic_delimiters_end = ""#" |\t|\n"#[" ", "\t", "\n"]
 __python_delimiters_end = ""#":|\\\\"#[":", "\\\\"]
-__fuzzed_file_name = "'../../fuzzed_file.txt'"
+fuzzed_file_name = "'../../fuzzed_file.txt'"
 __back_up_dir = "../../backup/"
 
 def __unsupported_file_type(backup_file, sourcefile):
@@ -20,7 +20,7 @@ def __mock_file_reads_in_python(backup_file, source_file):
     with open(__back_up_dir+str(backup_file), 'r') as __original_read:
         with open(str(source_file), 'w') as __original_write:
             for line in __original_read:
-                line = re.sub(__regex,  "open(" + __fuzzed_file_name + ",'r')", line)
+                line = re.sub(__regex,  "open(" + fuzzed_file_name + ",'r')", line)
                 __original_write.write(line)
 
 def __mock_file_reads_in_source(backup_files):
@@ -46,8 +46,10 @@ def restore_source_from_backup(backup_files):
     if not isinstance(backup_files, SourceBackup):
         raise ValueError("Incorrect object for backup_files. The object much be an instance of SourceBackup")
     __backup_files_list = backup_files.get_backup_files()
-    for __backup, __original in __backup_files_list:
-        with open(str("../../backup/"+__backup)) as __backup_file:
+    for __backup_data in __backup_files_list:
+        __backup = __backup_data['backup']
+        __original = __backup_data['original']
+        with open(str("../../backup/"+__backup),'r') as __backup_file:
             with open(__original, "w") as __original_file:
                 for line in __backup_file:
                     __original_file.write(line)
