@@ -3,7 +3,7 @@ import json
 import os
 import shutil
 import sys
-from chaostoolkitfuzzdiscover.constants.tmpfilenames import experiment_file_destination
+from chaostoolkitfuzzdiscover.constants.tmpfilenames import experiment_file_destination, fuzz_Input_data_location
 
 class ExperimentGenerator:
 
@@ -13,12 +13,12 @@ class ExperimentGenerator:
     __experiment_steady_state_hypothesis = None
     __experiment_rollbacks = []
 
-    def __init__(self, location):
+    def __init__(self):
         if os.path.exists(experiment_file_destination):
             shutil.rmtree(experiment_file_destination)
         if not os.path.exists(experiment_file_destination):
             os.makedirs(experiment_file_destination)
-        self.__fuzz_output_location = location
+        self.__fuzz_output_location = fuzz_Input_data_location
         os.system('chmod 755 ' + self.__fuzz_output_location.rstrip("\n")+"*")
         if "chaostoolitfuzzdiscover_steadystatehypothesis" not in sys.path:
             module_path = os.path.dirname(os.path.dirname(__file__))+"/chaostoolkitfuzzdiscover_steadystatehypothesis"
@@ -41,14 +41,6 @@ class ExperimentGenerator:
             __action["provider"]["path"] = name.rstrip("\n")
             __action["provider"]["arguments"] = "1"
             self.__experiment_methods.insert(len(self.__experiment_methods), __action)
-        __cleanup_action = {}
-        __cleanup_action["type"] = "action"
-        __cleanup_action["provider"] = {}
-        __cleanup_action["name"] = "cleaning-up-fuzzed-files"
-        __cleanup_action["provider"]["type"] = "process"
-        __cleanup_action["provider"]["path"] = "rm"
-        __cleanup_action["provider"]["arguments"] = "-r " + self.__fuzz_output_location.rstrip("\n")
-        self.__experiment_methods.insert(len(self.__experiment_methods), __cleanup_action)
 
     def generate_experiment_json(self):
         self.__experiment_json_obj = {}

@@ -69,6 +69,6 @@ start_up, fuzz_internal_files, kitty_modals, backup_source_files, backup_input_f
 #Fuzzing input
 for index, modal in enumerate(kitty_modals):
     __generate_fuzz_data(index, modal)
-__experiment_generator_obj = ExperimentGenerator(fuzz_Input_data_location)
+__experiment_generator_obj = ExperimentGenerator()
 __experiment_generator_obj.set_startup_scripts(start_up)
 __experiment_generator_obj.generate_experiment_json()
