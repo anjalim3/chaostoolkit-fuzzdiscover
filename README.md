@@ -48,6 +48,10 @@ Currently supports only python
     "~/chaos_demo/chaostoolkit-documentation-code/tutorials/a-simple-walkthrough/sunset.py"]
     }
 
+#Steady State Hypothesis
+Before beginning the experiment we profile system state for 10s and collect the data.
+After finishing the experiment, we profile the system state once more for 10s and check if there are any major discrepancies from the first collected data.
+
 #ToDo
 Add probes
 Add support for multiple input
