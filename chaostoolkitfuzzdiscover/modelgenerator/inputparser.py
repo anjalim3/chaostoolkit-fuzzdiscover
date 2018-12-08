@@ -2,7 +2,7 @@ import json
 from kitty.model import *
 from unannotatedinputparser import UnannotatedInputParser
 from annotatedinputparser import AnnotatedInputParser
-from chaostoolkitfuzzdiscover.fuzzinternalfilereads.instrumentsource import instrument_source
+from chaostoolkitfuzzdiscover.fuzzfilereads.instrumentsource import instrument_source
 
 #ToDo Add input validation
 class InputParser:
@@ -14,19 +14,26 @@ class InputParser:
         python_obj = json.loads(data)
         sample_input = python_obj["sample_input"]
         start_up = python_obj["start_up"]
-        __backup_files = None
+        __backup_source_files = None
+        __backup_input_files = None
         if "fuzz_internal_files_path_to_sources" in python_obj:
             fuzz_internal_files = python_obj["fuzz_internal_files_path_to_sources"]
         else:
             fuzz_internal_files = None
+        if "input_files" in python_obj:
+            input_files = python_obj["input_files"]
+        else:
+            input_files = None
         if "is_annotated" in python_obj:
             is_annotated = True if python_obj["is_annotated"] == "true" else False
         else:
             is_annotated = False
         modals = [InputParser.__get_kitty_models_from_sample_input(sample_input, is_annotated)]
         if fuzz_internal_files is not None:
-            __backup_files = instrument_source(fuzz_internal_files)
-        return start_up, fuzz_internal_files, modals, __backup_files
+            __backup_source_files = instrument_source(fuzz_internal_files, True)
+        if input_files is not None:
+            __backup_input_files = instrument_source(input_files, False)
+        return start_up, fuzz_internal_files, modals, __backup_source_files, __backup_input_files
 
     @staticmethod
     def __get_kitty_models_from_sample_input(sample_input, is_annotated):

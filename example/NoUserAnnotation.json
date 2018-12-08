@@ -6,5 +6,7 @@
   "sample_input" : ["curl -k https://localhost:8443/city/Chicago"],
 
   "fuzz_internal_files_path_to_sources" : ["/Users/anjmenon/chaos_demo/chaostoolkit-documentation-code/tutorials/a-simple-walkthrough/astre.py",
-    "/Users/anjmenon/chaos_demo/chaostoolkit-documentation-code/tutorials/a-simple-walkthrough/sunset.py"]
+    "/Users/anjmenon/chaos_demo/chaostoolkit-documentation-code/tutorials/a-simple-walkthrough/sunset.py"],
+
+  "input_files" : ["/Users/anjmenon/chaos_demo/chaostoolkit-documentation-code/tutorials/a-simple-walkthrough/cert.pem"]
 }

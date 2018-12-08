@@ -30,7 +30,7 @@ def __mock_file_reads_in_source(backup_files):
         func =__mock_file.get(__file_extension, lambda __lambda_backup, __lambda_source: __unsupported_file_type(__lambda_backup, __lambda_source))
         func(str(backup['backup']), str(backup['original']))
 
-def instrument_source(application_source_file_urls):
+def instrument_source(application_source_file_urls, is_source_file):
     backup_files = SourceBackup()
     for index, source_file in enumerate(application_source_file_urls):
         new_source_file = "ct_fuzz_backup_"+str(index)+".backup"
@@ -39,7 +39,8 @@ def instrument_source(application_source_file_urls):
             with open("../../backup/"+new_source_file, "w") as backup:
                 for line in original:
                     backup.write(line)
-    __mock_file_reads_in_source(backup_files)
+    if is_source_file:
+        __mock_file_reads_in_source(backup_files)
     return backup_files
 
 def restore_source_from_backup(backup_files):
