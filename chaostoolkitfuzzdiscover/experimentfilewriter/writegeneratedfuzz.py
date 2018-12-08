@@ -2,6 +2,7 @@ import glob
 import json
 import os
 import shutil
+import sys
 from chaostoolkitfuzzdiscover.constants.tmpfilenames import experiment_file_destination
 
 class ExperimentGenerator:
@@ -19,6 +20,9 @@ class ExperimentGenerator:
             os.makedirs(experiment_file_destination)
         self.__fuzz_output_location = location
         os.system('chmod 755 ' + self.__fuzz_output_location.rstrip("\n")+"*")
+        if "chaostoolitfuzzdiscover_steadystatehypothesis" not in sys.path:
+            module_path = os.path.dirname(os.path.dirname(__file__))+"/chaostoolkitfuzzdiscover_steadystatehypothesis"
+            sys.path.append(module_path)
         files = glob.glob(self.__fuzz_output_location.rstrip("\n")+"*")
         __permission_action = {}
         __permission_action["type"] = "action"
@@ -37,13 +41,20 @@ class ExperimentGenerator:
             __action["provider"]["path"] = name.rstrip("\n")
             __action["provider"]["arguments"] = "1"
             self.__experiment_methods.insert(len(self.__experiment_methods), __action)
+        __cleanup_action = {}
+        __cleanup_action["type"] = "action"
+        __cleanup_action["provider"] = {}
+        __cleanup_action["name"] = "cleaning-up-fuzzed-files"
+        __cleanup_action["provider"]["type"] = "process"
+        __cleanup_action["provider"]["path"] = "rm"
+        __cleanup_action["provider"]["arguments"] = "-r " + self.__fuzz_output_location.rstrip("\n")
+        self.__experiment_methods.insert(len(self.__experiment_methods), __cleanup_action)
 
     def generate_experiment_json(self):
         self.__experiment_json_obj = {}
         self.__experiment_json_obj["rollbacks"] = self.__experiment_rollbacks
         self.__experiment_json_obj["method"] = self.__experiment_methods
-        self.__experiment_json_obj["steady-state-hypothesis"] = {}
-        self.__experiment_json_obj["steady-state-hypothesis"]["title"] = "my hypothesis"
+        self.__experiment_json_obj["steady-state-hypothesis"] = self.__get_steady_state_hypothesis()
         self.__experiment_json_obj["tags"] = ["chaostoolkitfuzzdiscover-generated-experiment"]
         self.__experiment_json_obj["description"] = "My FuzzDiscover Experiment"
         self.__experiment_json_obj["title"] = "My FuzzDiscover Experiment"
@@ -64,5 +75,21 @@ class ExperimentGenerator:
             else:
                 __action["provider"]["arguments"] = ""
             self.__experiment_rollbacks.insert(-1, __action)
+
+    def __get_steady_state_hypothesis(self):
+        __steady_state_hypothesis = {}
+        __probes = []
+        __consolidated_probe = {}
+        __provider = {}
+        __provider["type"] = "python"
+        __provider["module"] = "chaostoolkitfuzzdiscover_checksteadystate"
+        __provider["func"] = "check_probe"
+        __consolidated_probe["tolerance"] = True
+        __consolidated_probe["type"] = "probe"
+        __consolidated_probe["provider"] = __provider
+        __consolidated_probe["name"] = "fuzzdiscover-consolidated-systemic-issue-checking-probe"
+        __steady_state_hypothesis["title"] = "Checking : Memory Leaks, Filesystem usage spikes, CPU utilization spikes, DB connection pool exhaustion, fork bombs"
+        __steady_state_hypothesis["probes"] = [__consolidated_probe]
+        return __steady_state_hypothesis
 
 
