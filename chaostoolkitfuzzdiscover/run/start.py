@@ -8,7 +8,7 @@ from katnip.targets.file import FileTarget
 from kitty.model import String
 from kitty.model import Template
 from kitty.model import GraphModel
-from chaostoolkitfuzzdiscover.experimentfilewriter.writegeneratedfuzz import ExperimentGenerator
+from chaostoolkitfuzzdiscover.experimentfilewriter.writegeneratedfuzz import InputFuzzExperimentGenerator, InputFileFuzzExperimentGenerator, InternalFileFuzzExperimentGenerator
 import os, shutil, pickle
 
 
@@ -37,7 +37,6 @@ def __generate_fuzz_file_for_fuzzinternalfilereads():
 
 def __generate_fuzz_data(index, kitty_modal):
     controller = EmptyController()
-    #ToDo: fix need for manually creating output folder
     if os.path.exists(fuzz_Input_data_location):
         shutil.rmtree(fuzz_Input_data_location)
     if not os.path.exists(fuzz_Input_data_location):
@@ -52,23 +51,33 @@ def __generate_fuzz_data(index, kitty_modal):
     fuzzer.stop()
 
 #Step 1: Parse input and generate a data modal
-start_up, fuzz_internal_files, kitty_modals, backup_source_files, backup_input_files = InputParser.parse_userinput("../../example/NoUserAnnotation.json")
-#start_up, fuzz_internal_files, kitty_modals = InputParser.parse_userinput("../../example/UserAnnotated.json")
-#Step 2: If any user annotated inputs are files, then back them up
-#if backup_input_files is not None:
-#    __binary_file = open(input_file_backup_data_binary, mode='w')
-#    pickle.dump(backup_input_files, __binary_file)
-#    __binary_file.close()
-#exit(0) #ToDo: Only for testing. Remove.
+def chaostoolkit_fuzzexperiment_wInputFuzzing(__file_name):
+    start_up, fuzz_internal_files, kitty_modals, backup_source_files, backup_input_files, __sample_input = InputParser.parse_userinput(__file_name, suppress_internal_file_fuzzing=True, suppress_input_file_fuzzing=True)
+    for index, modal in enumerate(kitty_modals):
+        __generate_fuzz_data(index, modal)
+    __experiment_generator_obj = InputFuzzExperimentGenerator()
+    __experiment_generator_obj.set_startup_scripts(start_up)
+    __experiment_generator_obj.generate_experiment_json("_input_fuzz_only")
+
+#Step 2: If any user has provided input files, then back them up
+def chaostoolkit_fuzzexperiment_Input_File_Fuzzing(__file_name):
+    start_up, fuzz_internal_files, kitty_modals, backup_source_files, backup_input_files, __sample_input = InputParser.parse_userinput(__file_name, suppress_input_fuzzing=True, suppress_internal_file_fuzzing=True)
+    if backup_input_files is not None:
+        __binary_file = open(input_file_backup_data_binary, mode='w')
+        pickle.dump(backup_input_files, __binary_file)
+        __binary_file.close()
+    __experiment_generator_obj = InputFileFuzzExperimentGenerator(backup_input_files, __sample_input)
+    __experiment_generator_obj.set_startup_scripts(start_up)
+    __experiment_generator_obj.generate_experiment_json("_input_file_fuzz_only")
+
 #Step 3: If user has asked for fuzzing of internal file reads, back up the input files (because we will be modifying them)
-#if backup_source_files is not None:
-    #__generate_fuzz_file_for_fuzzinternalfilereads()
-#    __binary_file = open(source_file_backup_data_binary, mode='w')
-#    pickle.dump(backup_source_files, __binary_file)
-#    __binary_file.close()
-#Fuzzing input
-for index, modal in enumerate(kitty_modals):
-    __generate_fuzz_data(index, modal)
-__experiment_generator_obj = ExperimentGenerator()
-__experiment_generator_obj.set_startup_scripts(start_up)
-__experiment_generator_obj.generate_experiment_json()
+def chaostoolkit_fuzzexperiment_Internal_File_Read_Fuzzing(__file_name):
+    start_up, fuzz_internal_files, kitty_modals, backup_source_files, backup_input_files, __sample_input = InputParser.parse_userinput(__file_name, suppress_input_fuzzing=True, suppress_input_file_fuzzing=True)
+    if backup_source_files is not None:
+        __generate_fuzz_file_for_fuzzinternalfilereads()
+        __binary_file = open(source_file_backup_data_binary, mode='w')
+        pickle.dump(backup_source_files, __binary_file)
+        __binary_file.close()
+    __experiment_generator_obj = InternalFileFuzzExperimentGenerator(__sample_input)
+    __experiment_generator_obj.set_startup_scripts(start_up)
+    __experiment_generator_obj.generate_experiment_json("_internal_file_read_fuzz_only")
