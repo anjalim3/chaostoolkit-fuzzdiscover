@@ -1,28 +1,42 @@
-import threading
-import time
+import pymysql
+from filenames import mysql_conn_pool_status, probe_file_destination
+import os
+import sys
 
-def loop1_10():
-    for i in range(1, 7):
-        time.sleep(1)
-        print(i)
+def __check_mysqldb_connection_leak(__stage, __hostname, __user, __password):
+    if os.path.exists(mysql_conn_pool_status):
+        os.remove(mysql_conn_pool_status)
+    if not os.path.exists(probe_file_destination):
+        os.makedirs(probe_file_destination)
+    __max_connections = None
+    __current_connections = None
+    connection = pymysql.connect(host=__hostname,
+                                 user=__user,
+                                 password=__password,
+                                 db='sys',
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
+    try:
+        with connection.cursor() as cursor:
+            __sql = "SHOW VARIABLES LIKE 'max_connections'"
+            cursor.execute(__sql)
+            result = cursor.fetchone()
+            __max_connections = int(result['Value'])
+        with connection.cursor() as cursor:
+            __sql = "select count(*) as current_conn_count from processlist"
+            cursor.execute(__sql)
+            result = cursor.fetchone()
+            __current_connections = result['current_conn_count']
+    finally:
+        connection.close()
+    with open(mysql_conn_pool_status, 'w') as __mysql_status_file:
+        if __max_connections is None or __current_connections is None:
+            __mysql_status_file.write("[WARNING]: DB Connection failed")
+        else:
+            __mysql_status_file.write("["+str(__stage)+"][LOG] MaxConnections: "+str(__max_connections)+ " CurrentConnections: "+str(__current_connections))
 
-def loopa_z():
-    for i in range(20, 25):
-        time.sleep(1)
-        print '*'
-
-a = threading.Thread(target=loop1_10)
-
-b = threading.Thread(target=loopa_z)
-a.start()
-b.start()
-print a.is_alive()
-print b.is_alive()
-exit(1)
-a.join()
-b.join()
-print a.is_alive()
-print b.is_alive()
-
-
-print threading.currentThread()
+if len(sys.argv) == 4:
+    __password = ''
+elif len(sys.argv) == 5:
+    __password = sys.argv[4]
+__check_mysqldb_connection_leak(sys.argv[1], sys.argv[2], sys.argv[3], __password)

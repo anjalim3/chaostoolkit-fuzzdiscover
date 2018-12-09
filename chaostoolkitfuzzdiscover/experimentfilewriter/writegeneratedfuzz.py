@@ -3,7 +3,7 @@ import json
 import os
 import shutil
 import sys
-from chaostoolkitfuzzdiscover.constants.tmpfilenames import experiment_file_destination, fuzz_Input_data_location
+from chaostoolkitfuzzdiscover.constants.tmpfilenames import experiment_file_destination, fuzz_Input_data_location, chaostoolkit_fuzzdicover_root
 
 class ExperimentGenerator:
 
@@ -54,6 +54,14 @@ class ExperimentGenerator:
         json.dump(self.__experiment_json_obj, __experiment_file, indent=4)
 
     def set_startup_scripts(self, start_up_scripts):
+        __clean_up_action = {}
+        __clean_up_action["type"] = "action"
+        __clean_up_action["provider"] = {}
+        __clean_up_action["name"] = "fuzz_discover_cleanup"
+        __clean_up_action["provider"]["type"] = "process"
+        __clean_up_action["provider"]["path"] = "rm"
+        __clean_up_action["provider"]["arguments"] = "-r "+chaostoolkit_fuzzdicover_root
+        self.__experiment_rollbacks.insert(0, __clean_up_action)
         for __script in start_up_scripts:
             __sections = __script.split(" ", 1)
             __action = {}
@@ -66,7 +74,7 @@ class ExperimentGenerator:
                 __action["provider"]["arguments"] = __sections[1].rstrip("\n")
             else:
                 __action["provider"]["arguments"] = ""
-            self.__experiment_rollbacks.insert(-1, __action)
+            self.__experiment_rollbacks.insert(len(self.__experiment_rollbacks), __action)
 
     def __get_steady_state_hypothesis(self):
         __steady_state_hypothesis = {}
