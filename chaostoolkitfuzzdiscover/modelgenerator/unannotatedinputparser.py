@@ -23,6 +23,8 @@ class UnannotatedInputParser:
     def __get_string_token(token):
         if GenericConstants.http_request_methods.__contains__(token):
             kitty_field = Group(values=GenericConstants.http_request_methods, fuzzable=True)
+        elif GenericConstants.network_protocols.__contains__(token):
+            kitty_field = Group(values=GenericConstants.network_protocols, fuzzable=True)
         else:
             kitty_field = String(token)
         return kitty_field
