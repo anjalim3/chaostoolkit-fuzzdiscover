@@ -1,4 +1,0 @@
-from restorebackup import restore_from_backup
-from chaostoolkitfuzzdiscover.constants.tmpfilenames import input_file_backup_data_binary
-
-restore_from_backup(input_file_backup_data_binary)

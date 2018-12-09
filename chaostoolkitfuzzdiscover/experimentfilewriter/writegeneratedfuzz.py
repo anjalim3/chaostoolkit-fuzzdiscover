@@ -13,6 +13,9 @@ class ExperimentGenerator():
         self.experiment_rollbacks = []
         if not os.path.exists(experiment_file_destination):
             os.makedirs(experiment_file_destination)
+        if "chaostoolitfuzzdiscover_steadystatehypothesis" not in sys.path:
+            module_path = os.path.dirname(os.path.dirname(__file__))+"/chaostoolkitfuzzdiscover_steadystatehypothesis"
+            sys.path.append(module_path)
 
     def __get_steady_state_hypothesis(self):
         __steady_state_hypothesis = {}
@@ -70,9 +73,6 @@ class InputFuzzExperimentGenerator(ExperimentGenerator):
         ExperimentGenerator.__init__(self)
         self.fuzz_output_location = fuzz_Input_data_location
         os.system('chmod 755 ' + self.fuzz_output_location.rstrip("\n") + "*")
-        if "chaostoolitfuzzdiscover_steadystatehypothesis" not in sys.path:
-            module_path = os.path.dirname(os.path.dirname(__file__))+"/chaostoolkitfuzzdiscover_steadystatehypothesis"
-            sys.path.append(module_path)
         files = glob.glob(self.fuzz_output_location.rstrip("\n") + "*")
         __permission_action = {}
         __permission_action["type"] = "action"
@@ -130,7 +130,7 @@ class InputFileFuzzExperimentGenerator(ExperimentGenerator):
         __clean_up_action["name"] = "fuzz_discover_restore"
         __clean_up_action["provider"]["type"] = "process"
         __clean_up_action["provider"]["path"] = "python"
-        __clean_up_action["provider"]["arguments"] = str(os.path.dirname(os.path.dirname(__file__)))+"/run/restoreinputfilebackup.py"
+        __clean_up_action["provider"]["arguments"] = str(os.path.dirname(os.path.dirname(__file__)))+"/restoreinputfilebackup.py"
         self.experiment_rollbacks.insert(0, __clean_up_action)
 
 class InternalFileFuzzExperimentGenerator(ExperimentGenerator):
@@ -138,9 +138,6 @@ class InternalFileFuzzExperimentGenerator(ExperimentGenerator):
     def __init__(self, __input_cmd):
         ExperimentGenerator.__init__(self)
         self.fuzz_output_location = tmp_folder
-        if "chaostoolitfuzzdiscover_steadystatehypothesis" not in sys.path:
-            module_path = os.path.dirname(os.path.dirname(__file__))+"/chaostoolkitfuzzdiscover_steadystatehypothesis"
-            sys.path.append(module_path)
         files = glob.glob(self.fuzz_output_location.rstrip("\n") + "*")
         for name in files:
             __copy_action = {}
@@ -170,6 +167,6 @@ class InternalFileFuzzExperimentGenerator(ExperimentGenerator):
         __clean_up_action["name"] = "fuzz_discover_restore"
         __clean_up_action["provider"]["type"] = "process"
         __clean_up_action["provider"]["path"] = "python"
-        __clean_up_action["provider"]["arguments"] = str(os.path.dirname(os.path.dirname(__file__)))+"/run/restoresourcebackup.py"
+        __clean_up_action["provider"]["arguments"] = str(os.path.dirname(os.path.dirname(__file__)))+"/restoresourcebackup.py"
         self.experiment_rollbacks.insert(0, __clean_up_action)
 

@@ -1,9 +1,8 @@
-from sourcebackup import SourceBackup
+from chaostoolkitfuzzdiscover.sourcebackup import SourceBackup
 import re
-import os
-import shutil
 from chaostoolkitfuzzdiscover.chaostoolkitfuzzdiscover_steadystatehypothesis.filenames import chaostoolkit_fuzzdicover_root
-from chaostoolkitfuzzdiscover.constants.tmpfilenames import backup_root, internal_read_mock_file
+from chaostoolkitfuzzdiscover.constants.tmpfilenames import internal_read_mock_file
+from chaostoolkitfuzzdiscover.dobackup import do_backup
 
 __python_regex_part_1 = "((open\(.+?,'r'\))|(open\(.+?\))|"
 __python_regex_part_2 = '(open\(.+?,\\\"r\\\"\)))'
@@ -33,31 +32,10 @@ def __mock_file_reads_in_source(backup_files):
         func(str(backup['backup']), str(backup['original']))
 
 def instrument_source(application_source_file_urls, is_source_file):
-    backup_files = SourceBackup()
-    if not os.path.exists(backup_root):
-       os.makedirs(backup_root)
-    for index, source_file in enumerate(application_source_file_urls):
-        new_source_file = "ct_fuzz_backup_"+str(index)+".backup"
-        backup_files.add_file_to_backups(new_source_file, source_file)
-        with open(str(source_file)) as original:
-            with open(backup_root+new_source_file, "w") as backup:
-                for line in original:
-                    backup.write(line)
+    backup_files = do_backup(application_source_file_urls)
     if is_source_file:
         __mock_file_reads_in_source(backup_files)
     return backup_files
-
-def restore_source_from_backup(backup_files):
-    if not isinstance(backup_files, SourceBackup):
-        raise ValueError("Incorrect object for backup_files. The object much be an instance of SourceBackup")
-    __backup_files_list = backup_files.get_backup_files()
-    for __backup_data in __backup_files_list:
-        __backup = __backup_data['backup']
-        __original = __backup_data['original']
-        with open(str(backup_root+__backup),'r') as __backup_file:
-            with open(__original, "w") as __original_file:
-                for line in __backup_file:
-                    __original_file.write(line)
 
 #ToDo: add support for other languages
 __mock_file = {

@@ -24,8 +24,12 @@ RUN one at a time and comment out the rest.
 
 
 """ Demo 1: User Input Fuzzing HappyCase """
-chaostoolkitfuzzdiscover.run.start.chaostoolkit_fuzzexperiment_wInputFuzzing(__unAnnotated_Example)
+#chaostoolkitfuzzdiscover.run.start.chaostoolkit_fuzzexperiment_wInputFuzzing(__unAnnotated_Example)
 
 
 """ Demo 2: User Input File Fuzzing """
 #chaostoolkitfuzzdiscover.run.start.chaostoolkit_fuzzexperiment_Input_File_Fuzzing(__unAnnotated_Example)
+
+
+""" Demo 3: Internal Input File Fuzzing """
+chaostoolkitfuzzdiscover.run.start.chaostoolkit_fuzzexperiment_Internal_File_Read_Fuzzing(__unAnnotated_Example)

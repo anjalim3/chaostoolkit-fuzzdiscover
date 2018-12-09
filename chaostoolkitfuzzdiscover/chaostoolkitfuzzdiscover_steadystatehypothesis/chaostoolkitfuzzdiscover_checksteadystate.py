@@ -106,6 +106,9 @@ def __get_system_state_from_top_cmd(__file_name):
                 __tokens = __line.split(" ")
                 __mem_unused = __tokens[-2]
                 __mem_unused = __mem_unused.rstrip("M")
+                if "K" in __mem_unused:
+                    __mem_unused = __mem_unused.rstrip("K")
+                    __mem_unused = int(__mem_unused)/1000
                 __min_initial_mem_unused = min(__min_initial_mem_unused, int(__mem_unused))
     __initial_cpu_idle = __initial_cpu_idle / __number_of_top_vals_to_sample
     return __initial_cpu_idle, __min_initial_mem_unused, __max_initial_process_count
@@ -144,3 +147,7 @@ def __check_db_conn_leak(__stage):
         return False
     print("DBConnection pool status: Initial: "+str(__init_conns)+" Final: "+str(__final_conns))
     return True
+
+
+__check_db_conn_leak("initial")
+__check_db_conn_leak("final")
