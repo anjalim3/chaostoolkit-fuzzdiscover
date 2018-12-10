@@ -27,7 +27,7 @@ This deep recursion will cause a resource(memory) exhaustion and force the pytho
 
 After the experiment is complete fuzzdiscover and chaostoolkit do a rollback to restore the original source files.
 
-###Setup
+### Setup
 
 1. Make a copy this folder 'fibo_demo' with all its contents into /tmp. Do not remove the original folder from this location.
 2. Check if your system allows core dump by executing:
@@ -40,7 +40,7 @@ After the experiment is complete fuzzdiscover and chaostoolkit do a rollback to 
 You can set you core dump limit back after finishing demo by running:
     `ulimit -c <initial_value_from_step_2_above>`
 
-###Running the demo
+### Running the demo
 
 1. Generate the experiment json file by running the corresponding demo in run/demo_run.py. 
     This generates the file "experiment_internal_file_read_fuzz_only.json" in "/tmp/chaostoolkitfuzzdiscover/experiment"
