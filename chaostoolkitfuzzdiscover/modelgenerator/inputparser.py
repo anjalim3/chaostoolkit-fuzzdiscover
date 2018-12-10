@@ -29,7 +29,7 @@ class InputParser:
         else:
             is_annotated = False
         if not suppress_input_fuzzing:
-            modals = [InputParser.__get_kitty_models_from_sample_input(sample_input, is_annotated)]
+            modals = [InputParser.get_kitty_models_from_sample_input(sample_input, is_annotated)]
         else:
             modals = None
         if fuzz_internal_files is not None:
@@ -39,7 +39,7 @@ class InputParser:
         return start_up, fuzz_internal_files, modals, __backup_source_files, __backup_input_files, sample_input
 
     @staticmethod
-    def __get_kitty_models_from_sample_input(sample_input, is_annotated):
+    def get_kitty_models_from_sample_input(sample_input, is_annotated):
         templates = []
         for input_line in sample_input:
             if is_annotated:

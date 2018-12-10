@@ -20,18 +20,30 @@ sample_template = Template(name='T1', fields=[
 sample_model = GraphModel()
 sample_model.connect(sample_template)
 #TODO : Add input validations & fix input
-def __generate_fuzz_file_for_fuzzinternalfilereads():
+def __generate_fuzz_file_for_fuzzinternalfilereads(input_files = None, sample_input = None):
     controller = EmptyController()
+    __my_modal = sample_model
     __tmp_folder = tmp_folder
     if os.path.exists(__tmp_folder):
         shutil.rmtree(__tmp_folder)
     if not os.path.exists(__tmp_folder):
         os.makedirs(__tmp_folder)
+    if sample_input is not None:
+        __parent_tokens = []
+        for __si in sample_input:
+            __tokens = str(__si).split()
+            if len(__tokens)>2:
+                __parent_tokens.extend(__tokens[2:])
+            elif len(__tokens) == 2:
+                __parent_tokens.extend(__tokens[1:])
+            else:
+                __parent_tokens.extend(__tokens)
+        __my_modal = InputParser.get_kitty_models_from_sample_input(__parent_tokens, False)
     target = FileTarget('FileTarget', __tmp_folder, 'fuzzed')
     target.set_controller(controller)
     fuzzer = ServerFuzzer()
     fuzzer.set_interface(WebInterface(port=26001))
-    fuzzer.set_model(sample_model)
+    fuzzer.set_model(__my_modal)
     fuzzer.set_target(target)
     fuzzer.start()
     fuzzer.stop()
@@ -65,7 +77,7 @@ def chaostoolkit_fuzzexperiment_Input_File_Fuzzing(__file_name):
     start_up, fuzz_internal_files, kitty_modals, backup_source_files, backup_input_files, __sample_input = InputParser.parse_userinput(__file_name, suppress_input_fuzzing=True, suppress_internal_file_fuzzing=True)
     if backup_input_files is not None:
         store_into_backup(backup_input_files, input_file_backup_data_binary)
-    __generate_fuzz_file_for_fuzzinternalfilereads()
+    __generate_fuzz_file_for_fuzzinternalfilereads(input_files=backup_input_files)
     __experiment_generator_obj = InputFileFuzzExperimentGenerator(backup_input_files.get_backup_files(), __sample_input)
     __experiment_generator_obj.set_startup_scripts(start_up)
     __experiment_generator_obj.generate_experiment_json("_input_file_fuzz_only")
@@ -75,7 +87,7 @@ def chaostoolkit_fuzzexperiment_Internal_File_Read_Fuzzing(__file_name):
     start_up, fuzz_internal_files, kitty_modals, backup_source_files, backup_input_files, __sample_input = InputParser.parse_userinput(__file_name, suppress_input_fuzzing=True, suppress_input_file_fuzzing=True)
     if backup_source_files is not None:
         store_into_backup(backup_source_files, source_file_backup_data_binary)
-    __generate_fuzz_file_for_fuzzinternalfilereads()
+    __generate_fuzz_file_for_fuzzinternalfilereads(sample_input=__sample_input)
     __experiment_generator_obj = InternalFileFuzzExperimentGenerator(__sample_input)
     __experiment_generator_obj.set_startup_scripts(start_up)
     __experiment_generator_obj.generate_experiment_json("_internal_file_read_fuzz_only")

@@ -6,6 +6,8 @@ import sys
 def __check_mysqldb_connection_leak(__stage, __hostname, __user, __password):
     if not os.path.exists(probe_file_destination):
         os.makedirs(probe_file_destination)
+    if os.path.exists(mysql_conn_pool_status) and "initial" in __stage:
+        os.remove(mysql_conn_pool_status)
     __max_connections = None
     __current_connections = None
     connection = pymysql.connect(host=__hostname,

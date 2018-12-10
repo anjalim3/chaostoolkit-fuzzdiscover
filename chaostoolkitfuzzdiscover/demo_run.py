@@ -6,6 +6,7 @@ import shutil
 __example_root_folder = os.path.dirname(os.path.dirname(__file__))
 __unAnnotated_Example = __example_root_folder+"/example/NoUserAnnotation.json"
 __annotated_Example = __example_root_folder+"/example/UserAnnotated.json"
+__demo_fibonacci_example =  __example_root_folder+"/example/fibo_demo/FibonacciTest.json"
 
 #Clean_up just in case
 if os.path.exists(chaostoolkit_fuzzdicover_root):
@@ -32,4 +33,8 @@ RUN one at a time and comment out the rest.
 
 
 """ Demo 3: Internal Input File Fuzzing """
-chaostoolkitfuzzdiscover.run.start.chaostoolkit_fuzzexperiment_Internal_File_Read_Fuzzing(__unAnnotated_Example)
+#chaostoolkitfuzzdiscover.run.start.chaostoolkit_fuzzexperiment_Internal_File_Read_Fuzzing(__unAnnotated_Example)
+
+
+""" Demo 4: Fibonacci Demo Internal Input File Fuzzing """
+chaostoolkitfuzzdiscover.run.start.chaostoolkit_fuzzexperiment_Internal_File_Read_Fuzzing(__demo_fibonacci_example)

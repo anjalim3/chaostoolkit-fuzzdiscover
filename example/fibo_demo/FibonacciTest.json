@@ -1,0 +1,8 @@
+{
+  "start_up" : [],
+
+  "sample_input" : ["python /tmp/fibo_demo/598_fibe_demo.py 2 3 90 89"],
+
+  "fuzz_internal_files_path_to_sources" : ["/tmp/fibo_demo/598_fibe_demo.py"]
+
+}

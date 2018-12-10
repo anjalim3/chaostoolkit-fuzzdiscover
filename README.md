@@ -35,7 +35,6 @@ Currently supports only python
 ## Sample Input
 
 ### UnAnnotated Input
-::
 
     {
       "start_up" :

@@ -3,9 +3,9 @@ import re
 from chaostoolkitfuzzdiscover.chaostoolkitfuzzdiscover_steadystatehypothesis.filenames import chaostoolkit_fuzzdicover_root
 from chaostoolkitfuzzdiscover.constants.tmpfilenames import internal_read_mock_file
 from chaostoolkitfuzzdiscover.dobackup import do_backup
-
-__python_regex_part_1 = "((open\(.+?,'r'\))|(open\(.+?\))|"
-__python_regex_part_2 = '(open\(.+?,\\\"r\\\"\)))'
+#|(open\(.+?\)) #ToDo: Leaving default to read out for now because this regex is replacing file writes also
+__python_regex_part_1 = "(open\(.+?( *),( *)'r'( *)\))"
+__python_regex_part_2 = ''#'(open\(.+?,\\\"r\\\"\)))' #ToDo: Leaving this out due to incorrect regex
 __generic_delimiters_begin = ""#" |\t|\n" #[" ", "\t", "\n"]
 __generic_delimiters_end = ""#" |\t|\n"#[" ", "\t", "\n"]
 __python_delimiters_end = ""#":|\\\\"#[":", "\\\\"]
