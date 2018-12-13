@@ -14,7 +14,7 @@ It later reads the file line by line and finds the nth Fibonnaci number for each
 "Segmentation failures" and memory exhaustions in general make systems "core dump" a consolidated byte-code file for debugging purposes.
 These "core dumps" (hprofs in case of JVM) are large files - running from few hundred MBs to few GBs in size - that eat up file system space.
 
-Core dumps usually slowly eat up disk space with each failure till one day you suddenly wake up to a full disk _[Real production issue]_
+Core dumps slowly eat up disk space with each failure till one day you suddenly wake up to a full disk _[Real production issue]_
 
 
 ### What FuzzDiscover does in this demo:
